@@ -25,7 +25,7 @@ const Contact = () => {
     if(!formData.name || !formData.email ||!formData.message || !formData.subject){
       setNotDone(true)
     } else {
-      
+
       try {
         // Make API request using Axios
         // 
@@ -42,7 +42,7 @@ const Contact = () => {
         });
   
         // Show pop-up message
-        setShowPopup(true);
+     alert('Form has been submitted')
       } catch (error) {
         console.error('API Error:', error.response ? error.response.data : error.message);
         alert('An error occurred while sending the message. Please try again.');
