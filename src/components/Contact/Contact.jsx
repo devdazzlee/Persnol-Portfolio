@@ -2,10 +2,12 @@ import React,{useState, useRef} from 'react'
 import emailjs from "@emailjs/browser";
 import { Container, Row, Col } from "react-bootstrap";
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 import './Contact.css'
 
 const Contact = () => {
     const form = useRef();
+    const [showPopup, setShowPopup] = useState(false);
     const [done, setDone] = useState(false)
     const [notDone, setNotDone] = useState(false)
     const [formData, setFormData] = useState({});
@@ -16,31 +18,35 @@ const Contact = () => {
         setNotDone(false)
     }
 
-    const sendEmail = (e) => {
+    const sendEmail = async(e) => {
     e.preventDefault();
-    
-    if(!formData.from_name || !formData.reply_to ||!formData.message){
+    console.log(formData.subject)
+    console.log(formData.from_name)
+    if(!formData.name || !formData.email ||!formData.message || !formData.subject){
       setNotDone(true)
     } else {
       
-      //  Please use your own credentials from emailjs or i will recive your email
-      
-    emailjs
-      .sendForm(
-        "service_niilndo",
-        "template_6z5idye",
-        form.current,
-        "VOBt6Akm1LhI5CZG-"
-      )
-      .then(
-        (result) => {
-          console.log(result.text);
-          setDone(true);
-        },
-        (error) => {
-          console.log(error.text);
-        }
-      );
+      try {
+        // Make API request using Axios
+        // 
+        const response = await axios.post('https://amused-culottes-bear.cyclic.app/api/v1/contact', formData);
+  
+        // Check the API response and handle accordingly
+        console.log('API Response:', response.data);
+  
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+  
+        // Show pop-up message
+        setShowPopup(true);
+      } catch (error) {
+        console.error('API Error:', error.response ? error.response.data : error.message);
+        alert('An error occurred while sending the message. Please try again.');
+      }
     }
     };
     
@@ -54,8 +60,9 @@ const Contact = () => {
             </Col>
             <Col md={6} className="c-right">
                 <form ref={form} onSubmit={sendEmail}>
-                <input type="text" name="from_name" className="user"  placeholder="Name" onChange={handleChange}/>
-                <input type="email" name="reply_to" className="user" placeholder="Email" onChange={handleChange} />
+                <input type="text" name="name" className="user"  placeholder="Name" onChange={handleChange}/>
+                <input type="email" name="email" className="user" placeholder="Email" onChange={handleChange} />
+                <input type="text"  name="subject"  className="user" placeholder="Subject" onChange={handleChange} />
                 <textarea name="message" className="user" placeholder="Message" onChange={handleChange} />
                 <span className='not-done' >{notDone && "Please, fill all the input field"}</span>
                 <Button type="submit" className="button" disabled={done}>Send</Button>
